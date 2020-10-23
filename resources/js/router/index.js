@@ -48,47 +48,33 @@ import permissionRoutes from './modules/permission';
 
 export const constantRoutes = [
   {
-    path: '/redirect',
-    component: Layout,
-    hidden: true,
+    path: '/redirect', component: Layout, hidden: true,
+    children: [
+      { path: '/redirect/:path*', component: () => import('@/views/redirect/index') },
+    ],
+  },
+  { path: '/login', component: () => import('@/views/login/index'), hidden: true },
+  { path: '/auth-redirect', component: () => import('@/views/login/AuthRedirect'), hidden: true },
+  { path: '/404', redirect: { name: 'Page404' }, component: () => import('@/views/error-page/404'), hidden: true },
+  { path: '/401', component: () => import('@/views/error-page/401'), hidden: true },
+  { path: '', component: Layout, redirect: 'dashboard',
     children: [
       {
-        path: '/redirect/:path*',
-        component: () => import('@/views/redirect/index'),
+        path: 'dashboard', component: () => import('@/views/dashboard/index'),
+        name: 'Dashboard', meta: { title: 'dashboard', icon: 'dashboard', noCache: false },
       },
     ],
   },
   {
-    path: '/login',
-    component: () => import('@/views/login/index'),
-    hidden: true,
-  },
-  {
-    path: '/auth-redirect',
-    component: () => import('@/views/login/AuthRedirect'),
-    hidden: true,
-  },
-  {
-    path: '/404',
-    redirect: { name: 'Page404' },
-    component: () => import('@/views/error-page/404'),
-    hidden: true,
-  },
-  {
-    path: '/401',
-    component: () => import('@/views/error-page/401'),
-    hidden: true,
-  },
-  {
-    path: '',
+    path: '/schedule',
     component: Layout,
-    redirect: 'dashboard',
+    redirect: '/schedule/index',
     children: [
       {
-        path: 'dashboard',
-        component: () => import('@/views/dashboard/index'),
-        name: 'Dashboard',
-        meta: { title: 'dashboard', icon: 'dashboard', noCache: false },
+        path: 'index',
+        name: 'Schedule',
+        component: () => import('@/views/schedule/index'),
+        meta: { title: 'Schedule', icon: 'table' },
       },
     ],
   },
