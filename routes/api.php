@@ -1,11 +1,14 @@
 <?php
 
+use Api\PersonnelController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use \App\Laravue\Faker;
 use \App\Laravue\JsonResponse;
 use \App\Laravue\Acl;
+
+use function Ramsey\Uuid\v1;
 
 /*
 |--------------------------------------------------------------------------
@@ -147,3 +150,7 @@ Route::get('articles/{id}/pageviews', function ($id) {
 
     return response()->json(new JsonResponse(['pvData' => $data]));
 });
+
+// SCHEDULES ROUTE
+//Route::get('personnels', [PersonnelController::class, 'index']);
+Route::resource('personnels', PersonnelController::class);

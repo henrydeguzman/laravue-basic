@@ -3,7 +3,9 @@
     <div class="filter-container">
       <el-input v-model="query.keyword" :placeholder="'sample'" style="width: 200px;" class="filter-item" />
       <el-input v-model="query.role" :placeholder="'sample 2'" style="width: 90px" class="filter-item" />
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleCreate"></el-button>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleCreate">
+        {{ $t('table.add') }}
+      </el-button>
     </div>
 
     <el-table v-loading="loading" :data="list" border fit highlight-current-row style="width: 100%">
@@ -27,19 +29,33 @@
     <!-- DIALOG FOR ADDING PERSONNEL -->
     <el-dialog :title="'Add new personnel'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
-        <el-form ref="personnelForm">
-
+        <el-form ref="personnelForm" :rules="rules" :model="newPersonnel" label-position="left" label-width="150px" style="max-width: 500px;">
+          <el-form-item :label="$t('schedulePersonnel.new')" prop="id">
+            <el-select v-model="newPersonnel.id" class="filter-item" placeholder="Please select personnel">
+              <el-option v-for="item in userList" :key="item.id" :label="item.name | uppercaseFirst" :value="item.id" />
+            </el-select>
+          </el-form-item>
         </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">
+            {{ $t('table.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="addPersonnel()">
+            {{ $t('table.add') }}
+          </el-button>
+        </div>
       </div>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import Pagination from '@/component/Pagination'; // Secondary package based on el-pagination
-import ScheduleResource from '@/api/schedule';
+import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
+import UserResource from '@/api/user';
+import PersonnelResource from '@/api/personnel';
 
-const scheduleResource = new ScheduleResource();
+const personnelResource = new PersonnelResource();
+const userResource = new UserResource();
 
 export default {
   name: 'PersonnelList',
@@ -47,6 +63,7 @@ export default {
   data() {
     return {
       list: null,
+      userList: null,
       total: 0,
       loading: true,
       userCreating: false,
@@ -56,19 +73,28 @@ export default {
       },
       dialogFormVisible: false,
       rules: {
-        user_id: { required: true, message: 'Please select personnel' },
+        id: { required: true, message: 'Please select personnel' },
       },
       newPersonnel: {},
+      personnels: [],
+      personnelAdding: false,
     };
   },
   created() {
     this.getList();
+    this.getUsers();
   },
   methods: {
+    async getUsers() {
+      const { data, meta } = await userResource.list(this.query);
+      console.log(data);
+      this.userList = data;
+      this.total = meta.total;
+    },
     async getList() {
       const { limit, page } = this.query;
       this.loading = true;
-      const { data, meta } = await scheduleResource.list(this.query);
+      const { data, meta } = await personnelResource.list(this.query);
       this.list = data;
       this.list.forEach((element, index) => {
         element['index'] = (page - 1) * limit + index + 1;
@@ -77,7 +103,16 @@ export default {
       this.loading = false;
     },
     addPersonnel() {
-      // this.$refs['']
+      console.log(this.newPersonnel);
+      this.$refs['personnelForm'].validate((valid) => {
+        if (valid) {
+          console.log('valid');
+          this.personnelAdding = true;
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
     },
     handleCreate() {
       this.resetNewPersonnel();
@@ -88,7 +123,7 @@ export default {
     },
     resetNewPersonnel() {
       this.newPersonnel = {
-        user_id: 0,
+        id: null,
       };
     },
   },
