@@ -7,14 +7,36 @@ use App\Http\Resources\PersonnelResource;
 use App\Laravue\Models\Personnel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Validator;
 
 class PersonnelController extends BaseController
 {
     const ITEM_PER_PAGE = 15;
-    public function index(Request $request) {
+    public function getList(Request $request) {
         $searchParams = $request->all();
-        $scheduleQuery = Personnel::query();
+        $scheduleQuery = Personnel::with('user')->orderBy('id', 'desc');
         $limit = Arr::get($searchParams, 'limit', static::ITEM_PER_PAGE);
+        // return Personnel::with('user')->orderBy('id', 'desc')->paginate(5);
         return PersonnelResource::collection(($scheduleQuery->paginate($limit)));
     }
+
+    public function store(Request $request) {
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'id' => ['required']
+            ]
+        );
+
+        if ($validator->fails()) {
+            return response()->json(['erros' => $validator->errors()], 403);
+        } else {
+            $params = $request->all();
+            $user = Personnel::create([
+                'user_id' => $params['id']
+            ]);
+            return new PersonnelResource($user);
+        }
+    }
+
 }

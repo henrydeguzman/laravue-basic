@@ -1,6 +1,6 @@
 <?php
 
-use Api\PersonnelController;
+use App\Http\Controllers\Api\PersonnelController;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -153,4 +153,5 @@ Route::get('articles/{id}/pageviews', function ($id) {
 
 // SCHEDULES ROUTE
 //Route::get('personnels', [PersonnelController::class, 'index']);
-Route::resource('personnels', PersonnelController::class);
+Route::get('personnels', [PersonnelController::class, 'getList']);
+Route::post('personnels', [PersonnelController::class, 'store']);

@@ -20,7 +20,7 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Validator;
+use Illuminate\Support\Facades\Validator;
 
 /**
  * Class UserController

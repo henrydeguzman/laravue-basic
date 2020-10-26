@@ -19,7 +19,7 @@
       <!-- COLUMN NAME -->
       <el-table-column align="center" label="Name">
         <template slot-scope="scope">
-          <span>{{ scope.row.name }}</span>
+          <span>{{ scope.row.user.name }}</span>
         </template>
       </el-table-column>
     </el-table>
@@ -99,6 +99,7 @@ export default {
       this.list.forEach((element, index) => {
         element['index'] = (page - 1) * limit + index + 1;
       });
+      console.log(data);
       this.total = meta.total;
       this.loading = false;
     },
@@ -106,13 +107,28 @@ export default {
       console.log(this.newPersonnel);
       this.$refs['personnelForm'].validate((valid) => {
         if (valid) {
-          console.log('valid');
           this.personnelAdding = true;
+          personnelResource
+            .store(this.newPersonnel)
+            .then(response => {
+              this.$message({
+                message: 'New personnel ' + this.newPersonnel.name + ' has been successfully added.',
+                type: 'success',
+                duration: 5 * 1000,
+              });
+              this.resetNewPersonnel();
+              this.dialogFormVisible = false;
+              this.handleFilter();
+            });
         } else {
           console.log('error submit!!');
           return false;
         }
       });
+    },
+    handleFilter() {
+      this.query.page = 1;
+      this.getList();
     },
     handleCreate() {
       this.resetNewPersonnel();
