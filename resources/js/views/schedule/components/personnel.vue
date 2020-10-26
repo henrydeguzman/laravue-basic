@@ -26,6 +26,10 @@
       <!-- COLUMN ACTIONS -->
       <el-table-column align="center" label="Actions">
         <template slot-scope="scope">
+
+          <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope.row)">
+            {{ $t('table.edit') }}
+          </el-button>
           <el-button type="danger" size="small" icon="el-icon-danger" @click="handleDelete(scope.row.id, scope.row.user)">
             Delete
           </el-button>
@@ -38,7 +42,7 @@
     <!-- DIALOG FOR ADDING PERSONNEL -->
     <el-dialog :title="'Add new personnel'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
-        <el-form ref="personnelForm" :rules="rules" :model="newPersonnel" label-position="left" label-width="150px" style="max-width: 500px;">
+        <el-form ref="personnelForm" :rules="rules" :model="newPersonnel" label-position="left" label-width="250px" style="max-width: 500px;">
           <el-form-item :label="$t('schedulePersonnel.new')" prop="id">
             <el-select v-model="newPersonnel.id" class="filter-item" placeholder="Please select personnel">
               <el-option v-for="item in userList" :key="item.id" :label="item.name | uppercaseFirst" :value="item.id" />
@@ -50,7 +54,7 @@
             {{ $t('table.cancel') }}
           </el-button>
           <el-button type="primary" @click="addPersonnel()">
-            {{ $t('table.add') }}
+            {{ currentPersonnel > 0 ? $t('table.update') : $t('table.add') }}
           </el-button>
         </div>
       </div>
@@ -87,6 +91,7 @@ export default {
       newPersonnel: {},
       personnels: [],
       personnelAdding: false,
+      currentPersonnel: 0,
     };
   },
   created() {
@@ -117,23 +122,43 @@ export default {
       this.$refs['personnelForm'].validate((valid) => {
         if (valid) {
           this.personnelAdding = true;
-          personnelResource
-            .store(this.newPersonnel)
-            .then(response => {
-              this.$message({
-                message: 'New personnel ' + this.newPersonnel.name + ' has been successfully added.',
-                type: 'success',
-                duration: 5 * 1000,
+          if (this.currentPersonnel > 0) {
+            console.log('update');
+            this.resetNewPersonnel();
+            this.dialogFormVisible = false;
+            this.handleFilter();
+
+            personnelResource
+              .update(this.newPersonnel, this.currentPersonnel)
+              .then(response => {
+                console.log(response);
               });
-              this.resetNewPersonnel();
-              this.dialogFormVisible = false;
-              this.handleFilter();
-            });
+          } else {
+            personnelResource
+              .store(this.newPersonnel)
+              .then(response => {
+                this.$message({
+                  message: 'New personnel ' + this.newPersonnel.name + ' has been successfully added.',
+                  type: 'success',
+                  duration: 5 * 1000,
+                });
+                this.resetNewPersonnel();
+                this.dialogFormVisible = false;
+                this.handleFilter();
+              });
+          }
         } else {
           console.log('error submit!!');
           return false;
         }
       });
+    },
+    handleEdit(row){
+      console.log(user);
+      const user = row.user;
+      this.dialogFormVisible = true;
+      this.currentPersonnel = row.id;
+      this.newPersonnel.id = user.id;
     },
     handleDelete(id, name){
       console.log(id);
@@ -170,6 +195,7 @@ export default {
       });
     },
     resetNewPersonnel() {
+      this.currentPersonnel = 0;
       this.newPersonnel = {
         id: null,
       };

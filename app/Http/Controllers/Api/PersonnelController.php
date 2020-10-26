@@ -48,4 +48,8 @@ class PersonnelController extends BaseController
         $isDelete = Personnel::find($id)->delete();
         return $isDelete;
     }
+
+    // public function update() {
+    //     return 'sf';
+    // }
 }
