@@ -294,6 +294,7 @@ export default {
       });
     },
     handleDelete(id, name) {
+      console.log(id);
       this.$confirm('This will permanently delete user ' + name + '. Continue?', 'Warning', {
         confirmButtonText: 'OK',
         cancelButtonText: 'Cancel',

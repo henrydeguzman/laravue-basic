@@ -155,3 +155,4 @@ Route::get('articles/{id}/pageviews', function ($id) {
 //Route::get('personnels', [PersonnelController::class, 'index']);
 Route::get('personnels', [PersonnelController::class, 'getList']);
 Route::post('personnels', [PersonnelController::class, 'store']);
+Route::delete('personnels/{id}', [PersonnelController::class, 'destroy']);

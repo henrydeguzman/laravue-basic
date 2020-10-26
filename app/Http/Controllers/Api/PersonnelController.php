@@ -38,5 +38,14 @@ class PersonnelController extends BaseController
             return new PersonnelResource($user);
         }
     }
-
+    public function destroy($id) {
+        // try{
+        //     $personnel->delete();
+        // } catch (\Exception $ex) {
+        //     return response()->json(['error' => $ex->getMessage()], 403);
+        // }
+        // return response()->json(null, 204);
+        $isDelete = Personnel::find($id)->delete();
+        return $isDelete;
+    }
 }

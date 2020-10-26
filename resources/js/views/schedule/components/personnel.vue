@@ -22,6 +22,15 @@
           <span>{{ scope.row.user.name }}</span>
         </template>
       </el-table-column>
+
+      <!-- COLUMN ACTIONS -->
+      <el-table-column align="center" label="Actions">
+        <template slot-scope="scope">
+          <el-button type="danger" size="small" icon="el-icon-danger" @click="handleDelete(scope.row.id, scope.row.user)">
+            Delete
+          </el-button>
+        </template>
+      </el-table-column>
     </el-table>
 
     <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
@@ -124,6 +133,29 @@ export default {
           console.log('error submit!!');
           return false;
         }
+      });
+    },
+    handleDelete(id, name){
+      console.log(id);
+      this.$confirm('Are you sure ?', 'Warning', {
+        confirmButtonText: 'OK',
+        cancelButtonText: 'Cancel',
+        type: 'warning',
+      }).then(() => {
+        personnelResource.destroy(id).then(response => {
+          this.$message({
+            type: 'success',
+            message: 'Delete completed',
+          });
+          this.handleFilter();
+        }).catch(error => {
+          console.log(error);
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: 'Delete cancelled',
+        });
       });
     },
     handleFilter() {
