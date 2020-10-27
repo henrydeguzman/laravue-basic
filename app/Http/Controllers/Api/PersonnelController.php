@@ -7,6 +7,7 @@ use App\Http\Resources\PersonnelResource;
 use App\Laravue\Models\Personnel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PersonnelController extends BaseController
@@ -49,7 +50,10 @@ class PersonnelController extends BaseController
         return $isDelete;
     }
 
-    // public function update() {
-    //     return 'sf';
-    // }
+    public function update($userid, $rowid) {
+        // return [$userid, $rowid];
+        return Personnel::find($rowid)->update([
+            'user_id' => $userid
+        ]);
+    }
 }

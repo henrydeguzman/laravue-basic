@@ -40,10 +40,10 @@
     <pagination v-show="total>0" :total="total" :page.sync="query.page" :limit.sync="query.limit" @pagination="getList" />
 
     <!-- DIALOG FOR ADDING PERSONNEL -->
-    <el-dialog :title="'Add new personnel'" :visible.sync="dialogFormVisible">
+    <el-dialog :title=" currentPersonnel > 0 ? 'Update personnel' : 'Add new personnel'" :visible.sync="dialogFormVisible">
       <div v-loading="userCreating" class="form-container">
         <el-form ref="personnelForm" :rules="rules" :model="newPersonnel" label-position="left" label-width="250px" style="max-width: 500px;">
-          <el-form-item :label="$t('schedulePersonnel.new')" prop="id">
+          <el-form-item :label="$t('schedulePersonnel.select')" prop="id">
             <el-select v-model="newPersonnel.id" class="filter-item" placeholder="Please select personnel">
               <el-option v-for="item in userList" :key="item.id" :label="item.name | uppercaseFirst" :value="item.id" />
             </el-select>
@@ -66,6 +66,7 @@
 import Pagination from '@/components/Pagination'; // Secondary package based on el-pagination
 import UserResource from '@/api/user';
 import PersonnelResource from '@/api/personnel';
+import axios from 'axios';
 
 const personnelResource = new PersonnelResource();
 const userResource = new UserResource();
@@ -118,20 +119,23 @@ export default {
       this.loading = false;
     },
     addPersonnel() {
-      console.log(this.newPersonnel);
       this.$refs['personnelForm'].validate((valid) => {
         if (valid) {
           this.personnelAdding = true;
           if (this.currentPersonnel > 0) {
             console.log('update');
-            this.resetNewPersonnel();
-            this.dialogFormVisible = false;
-            this.handleFilter();
-
-            personnelResource
-              .update(this.newPersonnel, this.currentPersonnel)
+            console.log(this.newPersonnel.id, this.currentPersonnel);
+            // personnelResource
+            //   .update(1, 2)
+            //   .then(response => {
+            //     console.log(response);
+            //   });
+            axios.put('api/personnels/' + this.newPersonnel.id + '/' + this.currentPersonnel, { sample: 1 })
               .then(response => {
                 console.log(response);
+                this.resetNewPersonnel();
+                this.dialogFormVisible = false;
+                this.handleFilter();
               });
           } else {
             personnelResource
@@ -154,11 +158,12 @@ export default {
       });
     },
     handleEdit(row){
-      console.log(user);
+      console.log(row);
       const user = row.user;
       this.dialogFormVisible = true;
       this.currentPersonnel = row.id;
       this.newPersonnel.id = user.id;
+      console.log(this.newPersonnel.id, this.currentPersonnel);
     },
     handleDelete(id, name){
       console.log(id);
